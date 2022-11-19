@@ -54,6 +54,9 @@ class SidebarProvider {
     const styleVSCodeUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.extensionUri, "media", "vscode.css")
     );
+    const styleSidebar = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.extensionUri, "media", "sidebar.css")
+    );
 
     const scriptMainUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.extensionUri, "media", "main.js")
@@ -78,10 +81,27 @@ class SidebarProvider {
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${styleResetUri}" rel="stylesheet">
 				<link href="${styleVSCodeUri}" rel="stylesheet">
+				<link href="${styleSidebar}" rel="stylesheet">
 			</head>
       <body>
-        <h1>Wanna drag some code?</h1>
-        <button id="loop-for" draggable="true">For Loop</button>
+				<header>
+					<label for="select-file">Select a file: </label>
+					<select name="select-file" id="select-file">
+						<option value="test.py">test.py</option>
+						<option value="main.js">main.js</option>
+					</select> 
+				</header>
+				<main>
+					<section class="variables-section">
+						<h2 class="secondary-heading">Variables</h2>
+						<div id="variable-block" draggable="true">
+								<input type="text" name="var-name" placeholder="name"/>
+								<input type="text" name="var-value" placeholder="value"/>
+						</div>
+					</section>
+					<!-- <button id="loop-for" draggable="true">For Loop</button> -->
+				</main>
+
 				<script nonce="${nonce}" src="${scriptMainUri}"></script>
 			</body>
 			</html>`;
@@ -91,12 +111,18 @@ class SidebarProvider {
 class GenerateCodeOnDropProvider {
   async provideDocumentDropEdits(_document, position, dataTransfer, token) {
     // Check the data transfer to see if we have some kind of text data
-    const dataTransferItem = dataTransfer.get("text/plain");
+    const blockIdRaw = dataTransfer.get("text/plain");
+    const blockId = await blockIdRaw.asString();
+
+    const dataTransferItem = dataTransfer.get(
+      this.getDataTransferValue(blockId)
+    );
+
     if (!dataTransferItem) {
       return undefined;
     }
     const text = await dataTransferItem.asString();
-    console.log(text);
+
     if (token.isCancellationRequested) {
       return undefined;
     }
@@ -105,6 +131,14 @@ class GenerateCodeOnDropProvider {
 
     snippet.appendText(text);
     return { insertText: snippet };
+  }
+
+  getDataTransferValue(dataTransferItemId) {
+    switch (dataTransferItemId) {
+      case "variable-block": {
+        return "text/x-python";
+      }
+    }
   }
 }
 

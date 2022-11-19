@@ -1,0 +1,8 @@
+.secondary-heading {
+  margin-bottom: 0.5rem;
+}
+
+#variable-block {
+  display: flex;
+  gap: 1rem;
+}
