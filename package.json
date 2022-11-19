@@ -10,14 +10,36 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:dragme.helloWorld"
+    "onCommand:dragme.helloWorld",
+    "onView:dragMe-sidebar",
+    "onLanguage:python"
   ],
-  "main": "./extension.js",
+  "main": "./src/extension.js",
   "contributes": {
     "commands": [{
       "command": "dragme.helloWorld",
       "title": "Hello World"
-    }]
+    }],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dragMe-sidebar-view",
+          "title": "DragMe",
+          "icon": "media/gripper.svg"
+        }
+      ]
+    },
+    "views": {
+      "dragMe-sidebar-view": [
+        {
+          "type": "webview",
+          "id": "dragMe-sidebar",
+          "name": "DragMe",
+          "icon": "media/gripper.svg",
+          "contextualTitle": "DragMe"
+        }
+      ]
+    }
   },
   "scripts": {
     "lint": "eslint .",
