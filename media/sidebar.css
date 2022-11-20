@@ -1,8 +1,37 @@
+section {
+  margin-bottom: 1.5rem;
+}
+
 .secondary-heading {
   margin-bottom: 0.5rem;
 }
 
-#variable-block {
+.block {
+  padding: 0.7rem 1rem;
+  background-color: rgb(33, 35, 49);
+  border-radius: 7px;
+
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+#variable-block div {
+  display: flex;
+  gap: 0.7rem;
+}
+
+#variable-block input {
+  border-radius: 5px;
+}
+
+#select-var-type {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: none;
+  border-radius: 5px;
+}
+
+#select-var-type option {
+  color: var(--vscode-input-foreground);
 }

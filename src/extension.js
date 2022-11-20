@@ -94,10 +94,24 @@ class SidebarProvider {
 				<main>
 					<section class="variables-section">
 						<h2 class="secondary-heading">Variables</h2>
-						<div id="variable-block" draggable="true">
-								<input type="text" name="var-name" placeholder="name"/>
-								<input type="text" name="var-value" placeholder="value"/>
+						<div id="variable-block" class="block" draggable="true">
+              <div>
+                <input type="text" name="var-name" placeholder="Label"/>
+                <select name="select-var-type" id="select-var-type">
+                  <option value="string">String</option>
+                  <option value="number">Number</option>
+                  <!-- <option value="boolean">Boolean</option> -->
+                  <!-- <option value="array">Array</option> -->
+                </select>  
+              </div>
+              <div class="variable-block-input">
+							  <input type="text" name="var-value" placeholder="Value"/>
+              </div>
 						</div>
+					</section>
+          <section class="conditions-section">
+						<h2 class="secondary-heading">Logical Statements</h2>
+						
 					</section>
 					<!-- <button id="loop-for" draggable="true">For Loop</button> -->
 				</main>

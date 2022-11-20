@@ -8,9 +8,28 @@
 
 function variable_dragstart_handler(event) {
   const varName = document.querySelector('input[name="var-name"]').value;
-  const varValue = document.querySelector('input[name="var-value"]').value;
+  const varType = document.querySelector("#select-var-type").value;
+  let varValue = document.querySelector('input[name="var-value"]').value;
+
+  if (!varName) {
+    return;
+  }
+
   event.dataTransfer.setData("text/plain", event.target.id);
-  event.dataTransfer.setData("text/x-python", `${varName} = ${varValue}`);
+
+  if (varType === "number") {
+    if (!varValue) {
+      varValue = "None";
+    }
+
+    event.dataTransfer.setData("text/x-python", `${varName} = ${varValue}`);
+  } else if (varType === "string") {
+    if (!varValue) {
+      varValue = "";
+    }
+
+    event.dataTransfer.setData("text/x-python", `${varName} = "${varValue}"`);
+  }
 }
 
 function variable_dragend_handler(event) {
