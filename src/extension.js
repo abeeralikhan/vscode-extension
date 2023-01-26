@@ -35,17 +35,17 @@ function getWebviewContent(webview, extensionUri) {
   const mainURI = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "media", "main.js")
   );
-  const createVariableURI = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "media", "createVariable.js")
-  );
-  const sidebarURI = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "media", "sidebar.js")
-  );
   const mainStyleURI = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "media", "main.css")
   );
   const sidebarStyleURI = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "media", "sidebar.css")
+  );
+  const resetStyleURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "reset.css")
+  );
+  const vscodeStyleURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "vscode.css")
   );
 
   return `<!DOCTYPE html>
@@ -60,6 +60,8 @@ function getWebviewContent(webview, extensionUri) {
       />
       <link href="${mainStyleURI}" rel="stylesheet">
       <link href="${sidebarStyleURI}" rel="stylesheet">
+      <link href="${resetStyleURI}" rel="stylesheet">
+      <link href="${vscodeStyleURI}" rel="stylesheet">
     </head>
     <body>
       <h2 class="title">Webview</h2>

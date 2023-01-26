@@ -37,14 +37,19 @@
   }
 
   function closeSideBar(block) {
-    if (block.classList.contains("persist")) makeAllHiddenAndRemoveColor();
+    console.log("run closeSideBar");
+    if (block.classList.contains("persist")) {
+      setTimeout(() => makeAllHiddenAndRemoveColor(), 100);
+    }
   }
 
   function addDraggingClass(block) {
     block.addEventListener("dragstart", (e) => {
       e.stopPropagation();
+
       closeSideBar(block);
       block.classList.add("dragging");
+      console.log("run addDraggingClass");
     });
   }
 
@@ -70,6 +75,7 @@ TODO: Register a new event listener on blocks having persist class
   dropZone.addEventListener("dragover", (e) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log("run drag over");
     const draggedBlock = document.querySelector(".dragging");
     const afterBlock = getDragAfterBlock("code-blocks", e.clientY);
 
@@ -112,6 +118,7 @@ TODO: Register a new event listener on blocks having persist class
     e.preventDefault();
     e.stopPropagation();
     const draggedBlock = document.querySelector(".dragging");
+    console.log("run drop");
 
     if (!draggedBlock.classList.contains("persist")) return;
 
