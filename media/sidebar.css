@@ -1,37 +1,103 @@
-section {
-  margin-bottom: 1.5rem;
+.side-navbar {
+  position: relative;
+  min-height: 101%;
 }
 
-.secondary-heading {
-  margin-bottom: 0.5rem;
+.sidebar-header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-.block {
-  padding: 0.7rem 1rem;
-  background-color: rgb(33, 35, 49);
-  border-radius: 7px;
+.sidebar-header > span {
+  color: black;
+  cursor: pointer;
+  font-weight: bolder;
+}
 
+ul {
+  list-style-type: none;
+  padding-top: 0.3rem;
+}
+
+li > p {
+  text-align: center;
+  font-size: 1.3rem;
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+li:not(.fg-color) > p:hover {
+  background-color: rgb(235, 235, 235);
+}
+
+.target-div {
+  position: absolute;
+  left: 101%;
+  top: -3.3rem;
+  height: 100%;
+}
+
+.parent-overlay-bar {
+  border-radius: 6px;
+  padding: 1rem;
+  background-color: #7a7a7a40;
+  min-width: 19rem;
+  min-height: 100%;
+  backdrop-filter: blur(2px);
+}
+
+.blocks-list {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 1rem;
 }
 
-#variable-block div {
-  display: flex;
-  gap: 0.7rem;
+.blocks-list > span {
+  color: red;
 }
 
-#variable-block input {
-  border-radius: 5px;
+.blocks-list [data-block-type="loop"] .holder {
+  background-color: transparent;
 }
 
-#select-var-type {
-  background-color: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
-  border: none;
-  border-radius: 5px;
+.create-var-section {
+  margin-bottom: 1.2rem;
 }
 
-#select-var-type option {
-  color: var(--vscode-input-foreground);
+.hidden {
+  display: none;
+}
+
+.navs .header {
+  cursor: pointer;
+}
+
+.math-color {
+  background-color: navy;
+}
+
+.variable-color {
+  background-color: crimson;
+}
+
+.loop-color {
+  background-color: purple;
+}
+
+.logic-color {
+  background-color: green;
+}
+
+.text-color {
+  background-color: yellow;
+  color: black !important;
+}
+.procedure-color {
+  background-color: orange;
+}
+
+.fg-color {
+  color: white;
 }

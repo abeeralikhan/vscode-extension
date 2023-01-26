@@ -1,181 +1,311 @@
 const vscode = require("vscode");
 const getNonce = require("./getNounce");
 
-class SidebarProvider {
-  _view;
-  _doc;
-
-  constructor(extensionUri) {
-    this.extensionUri = extensionUri;
-  }
-
-  resolveWebviewView(webviewView) {
-    this._view = webviewView;
-
-    webviewView.webview.options = {
-      // Allow scripts in the webview
-      enableScripts: true,
-
-      localResourceRoots: [this.extensionUri],
-    };
-
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-
-    webviewView.webview.onDidReceiveMessage(async (data) => {
-      switch (data.type) {
-        case "onInfo": {
-          if (!data.value) {
-            return;
-          }
-          vscode.window.showInformationMessage(data.value);
-          break;
-        }
-        case "onError": {
-          if (!data.value) {
-            return;
-          }
-          vscode.window.showErrorMessage(data.value);
-          break;
-        }
-      }
-    });
-  }
-
-  revive(panel) {
-    this._view = panel;
-  }
-
-  _getHtmlForWebview(webview) {
-    // Below is the default CSS
-    // That we will add with every view
-    const styleResetUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "media", "reset.css")
-    );
-    const styleVSCodeUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "media", "vscode.css")
-    );
-    const styleSidebar = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "media", "sidebar.css")
-    );
-
-    const scriptMainUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "media", "main.js")
-    );
-
-    // const styleMainUri = webview.asWebviewUri(
-    //   vscode.Uri.joinPath(this.extensionUri, "media", "compiled/sidebar.css")
-    // );
-
-    // Use a nonce to only allow a specific script to be run.
-    const nonce = getNonce();
-
-    return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<!--
-					Use a content security policy to only allow loading images from https or from our extension directory,
-					and only allow scripts that have a specific nonce.
-        -->
-        <meta http-equiv="Content-Security-Policy" content="img-src https: data:; style-src 'unsafe-inline' ${webview.cspSource}; script-src 'nonce-${nonce}';">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<link href="${styleResetUri}" rel="stylesheet">
-				<link href="${styleVSCodeUri}" rel="stylesheet">
-				<link href="${styleSidebar}" rel="stylesheet">
-			</head>
-      <body>
-				<header>
-					<label for="select-file">Select a file: </label>
-					<select name="select-file" id="select-file">
-						<option value="test.py">test.py</option>
-						<option value="main.js">main.js</option>
-					</select> 
-				</header>
-				<main>
-					<section class="variables-section">
-						<h2 class="secondary-heading">Variables</h2>
-						<div id="variable-block" class="block" draggable="true">
-              <div>
-                <input type="text" name="var-name" placeholder="Label"/>
-                <select name="select-var-type" id="select-var-type">
-                  <option value="string">String</option>
-                  <option value="number">Number</option>
-                  <!-- <option value="boolean">Boolean</option> -->
-                  <!-- <option value="array">Array</option> -->
-                </select>  
-              </div>
-              <div class="variable-block-input">
-							  <input type="text" name="var-value" placeholder="Value"/>
-              </div>
-						</div>
-					</section>
-          <section class="conditions-section">
-						<h2 class="secondary-heading">Logical Statements</h2>
-						
-					</section>
-					<!-- <button id="loop-for" draggable="true">For Loop</button> -->
-				</main>
-
-				<script nonce="${nonce}" src="${scriptMainUri}"></script>
-			</body>
-			</html>`;
-  }
-}
-
-class GenerateCodeOnDropProvider {
-  async provideDocumentDropEdits(_document, position, dataTransfer, token) {
-    // Check the data transfer to see if we have some kind of text data
-    const blockIdRaw = dataTransfer.get("text/plain");
-    const blockId = await blockIdRaw.asString();
-
-    const dataTransferItem = dataTransfer.get(
-      this.getDataTransferValue(blockId)
-    );
-
-    if (!dataTransferItem) {
-      return undefined;
-    }
-    const text = await dataTransferItem.asString();
-
-    if (token.isCancellationRequested) {
-      return undefined;
-    }
-    // Build a snippet to insert
-    const snippet = new vscode.SnippetString();
-
-    snippet.appendText(text);
-    return { insertText: snippet };
-  }
-
-  getDataTransferValue(dataTransferItemId) {
-    switch (dataTransferItemId) {
-      case "variable-block": {
-        return "text/x-python";
-      }
-    }
-  }
-}
-
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-  const sidebarProvider = new SidebarProvider(context.extensionUri);
-  // Enable our providers in plaintext files
-  const selector = { language: "python" };
-
-  // Sidebar
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider("dragMe-sidebar", sidebarProvider)
+    vscode.commands.registerCommand("dragme.start", () => {
+      // Create and show a new webview
+      const panel = vscode.window.createWebviewPanel(
+        "mainPanel", // Identifies the type of the webview. Used internally
+        "Drag Me", // Title of the panel displayed to the user
+        vscode.ViewColumn.One, // Editor column to show the new webview panel in.
+        {} // Webview options. More on these later.
+
+        // And set its HTML content
+      );
+
+      panel.webview.options = {
+        enableScripts: true,
+        enableModals: true,
+      };
+
+      // And set its HTML content
+      panel.webview.html = getWebviewContent(
+        panel.webview,
+        context.extensionUri
+      );
+    })
+  );
+}
+
+function getWebviewContent(webview, extensionUri) {
+  const mainURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "main.js")
+  );
+  const createVariableURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "createVariable.js")
+  );
+  const sidebarURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "sidebar.js")
+  );
+  const mainStyleURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "main.css")
+  );
+  const sidebarStyleURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "sidebar.css")
   );
 
-  // Drag-N-Drop
-  context.subscriptions.push(
-    vscode.languages.registerDocumentDropEditProvider(
-      selector,
-      new GenerateCodeOnDropProvider()
-    )
-  );
+  return `<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+      />
+      <link href="${mainStyleURI}" rel="stylesheet">
+      <link href="${sidebarStyleURI}" rel="stylesheet">
+    </head>
+    <body>
+      <h2 class="title">Webview</h2>
+      <div class="canvas">
+        <div class="constructs-area area">
+          <h2 class="title">Sidebar</h2>
+          <nav class="side-navbar">
+            <ul>
+              <!-- Math nav section -->
+              <li class="navs math-nav">
+                <p>Math</p>
+                <aside class="target-div math-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
+                    </div>
+                    <div class="blocks-list">
+                      <div
+                        class="data-block centered persist"
+                        data-index="0"
+                        data-block-type="math"
+                        data-math-type="single-num"
+                        data-dtype="number"
+                        draggable="true"
+                      >
+                        <input type="text" />
+                      </div>
+                      <div
+                        class="data-block centered persist"
+                        data-index="1"
+                        data-block-type="math"
+                        data-math-type="arithmetic-operation"
+                        draggable="true"
+                      >
+                        <div class="left-holder holder"></div>
+  
+                        <select name="arithmetic-operators">
+                          <option value="add" selected>+</option>
+                          <option value="sub">-</option>
+                          <option value="mult">x</option>
+                          <option value="div">÷</option>
+                          <option value="carret">^</option>
+                        </select>
+                        <div class="right-holder holder"></div>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+              </li>
+  
+              <!-- variable nav section -->
+              <li class="navs var-nav">
+                <p>Variables</p>
+                <aside class="target-div variable-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
+                    </div>
+                    <div class="create-var-section">
+                      <div class="code-block create-var" data-index="0">
+                        <div class="block-header centered">
+                          <p class="description">Create a new variable...</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="blocks-list hidden">
+                      <div
+                        class="code-block persist"
+                        data-index="0"
+                        data-block-type="variable"
+                        data-variable-type="set-variable"
+                        draggable="true"
+                      >
+                        <div class="block-header centered">
+                          <p class="description">
+                            set
+                            <label
+                              for="variable-list"
+                              class="variable-name variable-list"
+                            >
+                              <select name="variable-name"></select>
+                            </label>
+                            to
+                          </p>
+                          <!-- data-store section -->
+                          <div class="data-store"></div>
+                          <!-- data-store section -->
+                        </div>
+                      </div>
+                      <div
+                        class="code-block persist"
+                        data-index="1"
+                        data-block-type="variable"
+                        data-variable-type="get-variable"
+                        data-variable-name="value"
+                        draggable="true"
+                      >
+                        <div class="block-header centered">
+                          <p class="description">
+                            get
+                            <label
+                              for="variable-list"
+                              class="variable-name variable-list"
+                            >
+                              <select name="variable-name"></select>
+                            </label>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+              </li>
+  
+              <!-- loop nav section -->
+              <li class="navs for-nav">
+                <p>Loops</p>
+                <aside class="target-div loop-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined">close</span>
+                    </div>
+                    <div class="blocks-list">
+                      <div
+                        class="persist"
+                        data-index="0"
+                        data-block-type="loop"
+                        data-loop-type="while"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <p class="description">repeat "while"</p>
+                          <!-- data-store section start -->
+                          <div class="data-store"></div>
+                          <!-- data-store section end -->
+                        </div>
+                        <div class="block-body code-block centered">
+                          <p class="description">do</p>
+                          <div class="holder children dragged-over"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+              </li>
+  
+              <!-- condition nav section -->
+              <li class="navs condition-nav">
+                <p>Logic</p>
+                <aside class="target-div logic-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
+                    </div>
+                    <div class="blocks-list">
+                      <div
+                        class="data-block centered persist"
+                        data-index="0"
+                        data-block-type="logic"
+                        data-logic-type="logical-operation"
+                        draggable="true"
+                      >
+                        <div class="left-holder holder"></div>
+                        <select name="logical-operation">
+                          <option value="eq" selected>=</option>
+                          <option value="neq">≠</option>
+                          <option value="lt"><</option>
+                          <option value="lte">≤</option>
+                          <option value="gt">></option>
+                          <option value="gte">≥</option>
+                        </select>
+                        <div class="right-holder holder"></div>
+                      </div>
+  
+                      <div
+                        class="data-block centered persist"
+                        data-index="1"
+                        data-block-type="logic"
+                        data-logic-type="boolean-operation"
+                        draggable="true"
+                      >
+                        <div class="left-holder holder"></div>
+                        <select name="boolean-operation">
+                          <option value="and" selected>and</option>
+                          <option value="or">or</option>
+                        </select>
+                        <div class="right-holder holder"></div>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+              </li>
+  
+              <li class="navs text-nav">
+                <p>Text</p>
+                <aside class="target-div text-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
+                    </div>
+                    <div class="blocks-list">
+                      <div
+                        class="data-block centered persist"
+                        data-index="0"
+                        data-block-type="text"
+                        data-math-type="single-text"
+                        data-dtype="string"
+                        draggable="true"
+                      >
+                        "
+                        <input type="text" />
+                        "
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+              </li>
+  
+              <!-- procedure nav section -->
+              <li class="navs procedure-nav">
+                <p>Procedure</p>
+                <aside class="target-div procedure-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
+                    </div>
+                    <div class="blocks-list"><span>In progress...</span></div>
+                  </div>
+                </aside>
+              </li>
+            </ul>
+          </nav>
+        </div>
+  
+        <!-- Below is a sensitive region -->
+        <div class="code-blocks-area area">
+          <h2 class="title">Code Area</h2>
+          <div class="root area">
+            <div class="code-blocks"></div>
+          </div>
+        </div>
+      </div>
+    </body>
+
+    <script nonce="${getNonce}" src="${mainURI}"></script>
+</html>`;
 }
 
 // This method is called when your extension is deactivated

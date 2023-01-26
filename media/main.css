@@ -1,0 +1,247 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+.canvas {
+  height: 95vh;
+  /* width: 100%; */
+  /* background-color: red; */
+  padding: 1rem 2rem 2rem 2rem;
+
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 19rem 3fr;
+  column-gap: 2rem;
+}
+
+/* Sidebar */
+
+.code-blocks-area {
+  /* background-color: green; */
+  padding-inline: 1rem;
+}
+
+.title {
+  text-align: center;
+  margin-top: 1rem;
+  font-weight: 900;
+  /* font-size: 1.5rem; */
+}
+
+.area {
+  border: 2px dashed black;
+}
+
+.blocks {
+  /* background-color: red; */
+  padding-inline: 1rem;
+  margin-top: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.block {
+  background-color: grey;
+  cursor: pointer;
+  /* padding: 2rem; */
+  height: 5rem;
+  font-size: 1.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Code Area */
+
+.root {
+  min-height: 80%;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.root.area {
+  border-color: red;
+}
+
+.code-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-height: 90vh;
+}
+
+.code-block {
+  min-height: 2rem;
+  background-color: navy;
+  padding: 0 0 0 0.5rem;
+  border-radius: 10px;
+
+  width: max-content;
+  cursor: grab;
+}
+
+.code-block .description {
+  color: white;
+  font-size: 1.1em;
+  /* line-height: 2rem; */
+}
+
+[data-block-type="variable"] {
+  background-color: crimson;
+}
+
+.block-header {
+  /* position: relative; */
+  display: flex;
+  gap: 0.5rem;
+}
+
+.code-block .data-store {
+  min-height: 2rem;
+  min-width: 2rem;
+  /* background-color: white; */
+  /* position: absolute; */
+}
+
+.data-block,
+[data-variable-type="get-variable"] {
+  /* min-height: 2rem; */
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: grey 0.5px solid;
+
+  width: max-content;
+  min-height: max-content;
+  cursor: grab;
+}
+
+.data-block[data-block-type="math"] {
+  background-color: navy;
+  /* height: 2.5rem; */
+}
+
+.data-block[data-block-type="math"] input,
+.data-block[data-block-type="text"] input {
+  background-color: silver;
+  width: 2rem;
+  border-radius: 5px;
+  border: none;
+  text-align: center;
+  height: 1.5rem;
+  font-size: 1em;
+}
+
+.data-block {
+  gap: 0.3rem;
+}
+
+.data-block > select {
+  width: 4ch;
+  background-color: silver;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+
+  text-align: center;
+}
+
+.data-block[data-logic-type="boolean-operation"] > select {
+  width: 6.5ch;
+}
+
+/* Data Block --> Logic */
+/* Logic Type --> Arithmetic Operation */
+
+.data-block[data-block-type="logic"],
+.code-block[data-block-type="logic"] {
+  background-color: green;
+}
+
+.data-block[data-block-type="text"] {
+  background-color: yellow;
+}
+
+.holder {
+  min-width: 2rem;
+  min-height: 1.5rem;
+  background-color: white;
+
+  border-radius: 5px;
+  cursor: default;
+}
+
+/* Iterator - While Block */
+.holder.children {
+  /* background-color: aqua; */
+  /* position: absolute; */
+  margin: 0 0 0 0.9rem;
+  padding: 0.07rem 0 0.07rem 0.07rem;
+  min-width: 5.6rem;
+  border-radius: 5px 0 0 5px;
+  /* background-color: red; */
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.07rem;
+}
+
+.code-block.block-header {
+  border-radius: 5px 5px 5px 0;
+}
+
+.code-block.block-body {
+  border-radius: 0 0 5px 5px;
+  padding: 0 0 0.5rem 0.5rem;
+}
+
+.code-block.block-header,
+.code-block.block-body {
+  background-color: purple;
+}
+
+/* Utility */
+.centered {
+  display: flex;
+  align-items: center;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.holder.dragged-over {
+  /* border: 5px solid rgba(255, 196, 0, 0.562); */
+}
+
+.create-var {
+  padding: 0.5rem;
+  border-radius: 10px;
+  background-color: black;
+
+  cursor: pointer;
+}
+
+/* Follow same styling for not, true, etc blocks */
+/* [data-variable-type="get-variable"] {
+  
+} */
+
+.variable-list > select {
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  padding: 2px 4px;
+  margin: 1px;
+  background-color: silver;
+  text-align: center;
+  min-width: 5ch;
+}
+
+.variable-list > select > option {
+  min-width: 5ch;
+}
