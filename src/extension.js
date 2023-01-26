@@ -27,6 +27,29 @@ function activate(context) {
         panel.webview,
         context.extensionUri
       );
+
+      panel.webview.onDidReceiveMessage(async (message) => {
+        if (message.command === "prompt") {
+          while (true) {
+            let newVariableName = await vscode.window.showInputBox();
+            if (!newVariableName) return;
+
+            if (newVariableName.includes(" "))
+              newVariableName = newVariableName.split(" ").join("_");
+
+            if (message.payload.includes(newVariableName)) {
+              vscode.window.showWarningMessage("Variable name already exist");
+              continue;
+            }
+
+            panel.webview.postMessage({
+              command: "addNewVariable",
+              payload: newVariableName,
+            });
+            return;
+          }
+        }
+      });
     })
   );
 }

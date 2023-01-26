@@ -1,5 +1,7 @@
 (function () {
   // blocks and data-blocks
+  const vscode = acquireVsCodeApi();
+  console.log(vscode);
   const blocks = document.querySelectorAll("[draggable='true']");
 
   // drop areas
@@ -37,7 +39,6 @@
   }
 
   function closeSideBar(block) {
-    console.log("run closeSideBar");
     if (block.classList.contains("persist")) {
       setTimeout(() => makeAllHiddenAndRemoveColor(), 100);
     }
@@ -49,7 +50,6 @@
 
       closeSideBar(block);
       block.classList.add("dragging");
-      console.log("run addDraggingClass");
     });
   }
 
@@ -75,7 +75,6 @@ TODO: Register a new event listener on blocks having persist class
   dropZone.addEventListener("dragover", (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("run drag over");
     const draggedBlock = document.querySelector(".dragging");
     const afterBlock = getDragAfterBlock("code-blocks", e.clientY);
 
@@ -118,7 +117,6 @@ TODO: Register a new event listener on blocks having persist class
     e.preventDefault();
     e.stopPropagation();
     const draggedBlock = document.querySelector(".dragging");
-    console.log("run drop");
 
     if (!draggedBlock.classList.contains("persist")) return;
 
@@ -368,44 +366,41 @@ TODO: Register a new event listener on blocks having persist class
     closeButton.addEventListener("click", makeAllHiddenAndRemoveColor);
   });
 
+  // CREATE VARIABLE
+
   const createVariableBtn = document.querySelector(".create-var");
   const variables = [];
 
   createVariableBtn.addEventListener("click", (e) => {
     e.preventDefault();
 
-    while (true) {
-      let newVariableName = prompt("New variable name:");
+    vscode.postMessage({
+      command: "prompt",
+      payload: variables,
+    });
 
-      if (!newVariableName) return;
+    return;
+  });
 
-      newVariableName = newVariableName.trim();
+  window.addEventListener("message", (e) => {
+    const newVariableName = e.data.payload;
+    const newVariableEl = createNewVariable(newVariableName);
 
-      if (newVariableName.includes(" "))
-        newVariableName = newVariableName.split(" ").join("_");
+    appendNewVariableToDom(newVariableEl);
+    appendNewVariableToVariables(newVariableName);
 
-      const newVariableEl = createNewVariable(newVariableName);
+    const variableBlocksContainer = document.querySelector(
+      ".variable-subside .blocks-list"
+    );
 
-      if (!newVariableEl) {
-        alert("Variable name already exist");
-        continue;
-      }
-
-      appendNewVariableToDom(newVariableEl);
-      appendNewVariableToVariables(newVariableName);
-
-      const variableBlocksContainer = document.querySelector(
-        ".variable-subside .blocks-list"
-      );
-
-      if (
-        variables.length > 0 &&
-        variableBlocksContainer.classList.contains("hidden")
-      ) {
-        variableBlocksContainer.classList.remove("hidden");
-      }
-      return;
+    if (
+      variables.length > 0 &&
+      variableBlocksContainer.classList.contains("hidden")
+    ) {
+      variableBlocksContainer.classList.remove("hidden");
     }
+
+    return;
   });
 
   function createNewVariable(name) {
