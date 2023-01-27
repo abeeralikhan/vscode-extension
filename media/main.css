@@ -3,6 +3,9 @@
   margin: 0;
   box-sizing: border-box;
   font-family: sans-serif;
+}
+
+body {
   color: black;
 }
 
@@ -14,7 +17,7 @@
 
   display: grid;
   grid-auto-flow: column;
-  grid-template-columns: 15rem 3fr 35rem;
+  grid-template-columns: 15rem 3fr 32rem;
   column-gap: 2rem;
 }
 
@@ -277,6 +280,6 @@
 }
 
 .code-holder {
-  font-size: 1.6rem;
-  tab-size: 4;
+  font-size: 1.3rem;
+  font-family: monospace;
 }

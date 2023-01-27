@@ -29,7 +29,7 @@ li > p {
 }
 
 li:not(.fg-color) > p:hover {
-  background-color: rgb(235, 235, 235);
+  background-color: rgb(235, 235, 235) !important;
 }
 
 .target-div {

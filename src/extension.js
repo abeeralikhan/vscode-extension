@@ -4,7 +4,7 @@ const beautify = require("js-beautify").js_beautify;
 
 function beautifyC(code) {
   // Set options for beautify
-  var options = {
+  const options = {
     indent_size: 1,
     indent_char: "\t",
     preserve_newlines: true,
@@ -357,7 +357,7 @@ function getWebviewContent(webview, extensionUri) {
       </div>
 
       <div class="code-generate-area area">
-        <h2 class="title">Code</h2>
+        <h2 class="title">Code - C Language</h2>
         <span class="code-holder"></span>
         <div class="code-generate-btn">
           <img src="${playBtnURI}" alt="play" />
