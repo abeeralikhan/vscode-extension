@@ -1,5 +1,19 @@
 const vscode = require("vscode");
 const getNonce = require("./getNounce");
+const beautify = require("js-beautify").js_beautify;
+
+function beautifyC(code) {
+  // Set options for beautify
+  var options = {
+    indent_size: 1,
+    indent_char: "\t",
+    preserve_newlines: true,
+    brace_style: "expand",
+    space_before_conditional: true,
+  };
+  // beautify the code
+  return beautify(code, options);
+}
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -49,6 +63,15 @@ function activate(context) {
             return;
           }
         }
+
+        if (message.command === "beautifyC") {
+          const code = beautifyC(message.payload);
+          panel.webview.postMessage({
+            command: "codeGenerate",
+            payload: code,
+          });
+          return;
+        }
       });
     })
   );
@@ -71,6 +94,14 @@ function getWebviewContent(webview, extensionUri) {
     vscode.Uri.joinPath(extensionUri, "media", "vscode.css")
   );
 
+  const playBtnURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "play-circle-outline.svg")
+  );
+
+  const trashBtnURI = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "media", "trash-bin-outline.svg")
+  );
+
   return `<!DOCTYPE html>
   <html lang="en">
     <head>
@@ -83,253 +114,259 @@ function getWebviewContent(webview, extensionUri) {
       />
       <link href="${mainStyleURI}" rel="stylesheet">
       <link href="${sidebarStyleURI}" rel="stylesheet">
-      <link href="${resetStyleURI}" rel="stylesheet">
-      <link href="${vscodeStyleURI}" rel="stylesheet">
+
     </head>
     <body>
-      <h2 class="title">Webview</h2>
-      <div class="canvas">
-        <div class="constructs-area area">
-          <h2 class="title">Sidebar</h2>
-          <nav class="side-navbar">
-            <ul>
-              <!-- Math nav section -->
-              <li class="navs math-nav">
-                <p>Math</p>
-                <aside class="target-div math-subside hidden">
-                  <div class="parent-overlay-bar">
-                    <div class="sidebar-header">
-                      <span class="material-symbols-outlined"> close </span>
+    <div class="canvas">
+      <div class="constructs-area area">
+        <nav class="side-navbar">
+          <ul>
+            <!-- Math nav section -->
+            <li class="navs math-nav">
+              <p>Math</p>
+              <aside class="target-div math-subside hidden">
+                <div class="parent-overlay-bar">
+                  <div class="sidebar-header">
+                    <span class="material-symbols-outlined"> close </span>
+                  </div>
+                  <div class="blocks-list">
+                    <div
+                      class="data-block centered persist"
+                      data-index="0"
+                      data-block-type="math"
+                      data-math-type="single-num"
+                      data-dtype="number"
+                      draggable="true"
+                    >
+                      <input type="text" />
                     </div>
-                    <div class="blocks-list">
-                      <div
-                        class="data-block centered persist"
-                        data-index="0"
-                        data-block-type="math"
-                        data-math-type="single-num"
-                        data-dtype="number"
-                        draggable="true"
-                      >
-                        <input type="text" />
-                      </div>
-                      <div
-                        class="data-block centered persist"
-                        data-index="1"
-                        data-block-type="math"
-                        data-math-type="arithmetic-operation"
-                        draggable="true"
-                      >
-                        <div class="left-holder holder"></div>
-  
-                        <select name="arithmetic-operators">
-                          <option value="add" selected>+</option>
-                          <option value="sub">-</option>
-                          <option value="mult">x</option>
-                          <option value="div">÷</option>
-                          <option value="carret">^</option>
-                        </select>
-                        <div class="right-holder holder"></div>
+                    <div
+                      class="data-block centered persist"
+                      data-index="1"
+                      data-block-type="math"
+                      data-math-type="arithmetic-operation"
+                      draggable="true"
+                    >
+                      <div class="left-holder holder"></div>
+
+                      <select name="arithmetic-operators">
+                        <option value="+" selected>+</option>
+                        <option value="-">-</option>
+                        <option value="*">x</option>
+                        <option value="/">÷</option>
+                      </select>
+                      <div class="right-holder holder"></div>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </li>
+
+            <!-- variable nav section -->
+            <li class="navs var-nav">
+              <p>Variables</p>
+              <aside class="target-div variable-subside hidden">
+                <div class="parent-overlay-bar">
+                  <div class="sidebar-header">
+                    <span class="material-symbols-outlined"> close </span>
+                  </div>
+                  <div class="create-var-section">
+                    <div class="code-block create-var" data-index="0">
+                      <div class="block-header centered">
+                        <p class="description">Create a new variable...</p>
                       </div>
                     </div>
                   </div>
-                </aside>
-              </li>
-  
-              <!-- variable nav section -->
-              <li class="navs var-nav">
-                <p>Variables</p>
-                <aside class="target-div variable-subside hidden">
-                  <div class="parent-overlay-bar">
-                    <div class="sidebar-header">
-                      <span class="material-symbols-outlined"> close </span>
-                    </div>
-                    <div class="create-var-section">
-                      <div class="code-block create-var" data-index="0">
-                        <div class="block-header centered">
-                          <p class="description">Create a new variable...</p>
-                        </div>
+                  <div class="blocks-list hidden">
+                    <div
+                      class="code-block persist"
+                      data-index="0"
+                      data-block-type="variable"
+                      data-variable-type="set-variable"
+                      draggable="true"
+                    >
+                      <div class="block-header centered">
+                        <p class="description">
+                          set
+                          <label
+                            for="variable-list"
+                            class="variable-name variable-list"
+                          >
+                            <select name="variable-name"></select>
+                          </label>
+                          to
+                        </p>
+                        <!-- data-store section -->
+                        <div class="data-store"></div>
+                        <!-- data-store section -->
                       </div>
                     </div>
-                    <div class="blocks-list hidden">
-                      <div
-                        class="code-block persist"
-                        data-index="0"
-                        data-block-type="variable"
-                        data-variable-type="set-variable"
-                        draggable="true"
-                      >
-                        <div class="block-header centered">
-                          <p class="description">
-                            set
-                            <label
-                              for="variable-list"
-                              class="variable-name variable-list"
-                            >
-                              <select name="variable-name"></select>
-                            </label>
-                            to
-                          </p>
-                          <!-- data-store section -->
-                          <div class="data-store"></div>
-                          <!-- data-store section -->
-                        </div>
-                      </div>
-                      <div
-                        class="code-block persist"
-                        data-index="1"
-                        data-block-type="variable"
-                        data-variable-type="get-variable"
-                        data-variable-name="value"
-                        draggable="true"
-                      >
-                        <div class="block-header centered">
-                          <p class="description">
-                            get
-                            <label
-                              for="variable-list"
-                              class="variable-name variable-list"
-                            >
-                              <select name="variable-name"></select>
-                            </label>
-                          </p>
-                        </div>
+                    <div
+                      class="code-block persist"
+                      data-index="1"
+                      data-block-type="variable"
+                      data-variable-type="get-variable"
+                      data-variable-name="value"
+                      draggable="true"
+                    >
+                      <div class="block-header centered">
+                        <p class="description">
+                          get
+                          <label
+                            for="variable-list"
+                            class="variable-name variable-list"
+                          >
+                            <select name="variable-name"></select>
+                          </label>
+                        </p>
                       </div>
                     </div>
                   </div>
-                </aside>
-              </li>
-  
-              <!-- loop nav section -->
-              <li class="navs for-nav">
-                <p>Loops</p>
-                <aside class="target-div loop-subside hidden">
-                  <div class="parent-overlay-bar">
-                    <div class="sidebar-header">
-                      <span class="material-symbols-outlined">close</span>
-                    </div>
-                    <div class="blocks-list">
-                      <div
-                        class="persist"
-                        data-index="0"
-                        data-block-type="loop"
-                        data-loop-type="while"
-                        draggable="true"
-                      >
-                        <div class="block-header code-block centered">
-                          <p class="description">repeat "while"</p>
-                          <!-- data-store section start -->
-                          <div class="data-store"></div>
-                          <!-- data-store section end -->
-                        </div>
-                        <div class="block-body code-block centered">
-                          <p class="description">do</p>
-                          <div class="holder children dragged-over"></div>
-                        </div>
+                </div>
+              </aside>
+            </li>
+
+            <!-- loop nav section -->
+            <li class="navs for-nav">
+              <p>Loops</p>
+              <aside class="target-div loop-subside hidden">
+                <div class="parent-overlay-bar">
+                  <div class="sidebar-header">
+                    <span class="material-symbols-outlined">close</span>
+                  </div>
+                  <div class="blocks-list">
+                    <div
+                      class="persist"
+                      data-index="0"
+                      data-block-type="loop"
+                      data-loop-type="while"
+                      draggable="true"
+                    >
+                      <div class="block-header code-block centered">
+                        <p class="description">repeat "while"</p>
+                        <!-- data-store section start -->
+                        <div class="data-store"></div>
+                        <!-- data-store section end -->
+                      </div>
+                      <div class="block-body code-block centered">
+                        <p class="description">do</p>
+                        <div class="holder children dragged-over"></div>
                       </div>
                     </div>
                   </div>
-                </aside>
-              </li>
-  
-              <!-- condition nav section -->
-              <li class="navs condition-nav">
-                <p>Logic</p>
-                <aside class="target-div logic-subside hidden">
-                  <div class="parent-overlay-bar">
-                    <div class="sidebar-header">
-                      <span class="material-symbols-outlined"> close </span>
+                </div>
+              </aside>
+            </li>
+
+            <!-- condition nav section -->
+            <li class="navs condition-nav">
+              <p>Logic</p>
+              <aside class="target-div logic-subside hidden">
+                <div class="parent-overlay-bar">
+                  <div class="sidebar-header">
+                    <span class="material-symbols-outlined"> close </span>
+                  </div>
+                  <div class="blocks-list">
+                    <div
+                      class="data-block centered persist"
+                      data-index="0"
+                      data-block-type="logic"
+                      data-logic-type="logical-operation"
+                      draggable="true"
+                    >
+                      <div class="left-holder holder"></div>
+                      <select name="logical-operation">
+                        <option value="==" selected>=</option>
+                        <option value="!=">≠</option>
+                        <option value="<"><</option>
+                        <option value="<=">≤</option>
+                        <option value=">">></option>
+                        <option value=">=">≥</option>
+                      </select>
+                      <div class="right-holder holder"></div>
                     </div>
-                    <div class="blocks-list">
-                      <div
-                        class="data-block centered persist"
-                        data-index="0"
-                        data-block-type="logic"
-                        data-logic-type="logical-operation"
-                        draggable="true"
-                      >
-                        <div class="left-holder holder"></div>
-                        <select name="logical-operation">
-                          <option value="eq" selected>=</option>
-                          <option value="neq">≠</option>
-                          <option value="lt"><</option>
-                          <option value="lte">≤</option>
-                          <option value="gt">></option>
-                          <option value="gte">≥</option>
-                        </select>
-                        <div class="right-holder holder"></div>
-                      </div>
-  
-                      <div
-                        class="data-block centered persist"
-                        data-index="1"
-                        data-block-type="logic"
-                        data-logic-type="boolean-operation"
-                        draggable="true"
-                      >
-                        <div class="left-holder holder"></div>
-                        <select name="boolean-operation">
-                          <option value="and" selected>and</option>
-                          <option value="or">or</option>
-                        </select>
-                        <div class="right-holder holder"></div>
-                      </div>
+
+                    <div
+                      class="data-block centered persist"
+                      data-index="1"
+                      data-block-type="logic"
+                      data-logic-type="boolean-operation"
+                      draggable="true"
+                    >
+                      <div class="left-holder holder"></div>
+                      <select name="boolean-operation">
+                        <option value="&&" selected>and</option>
+                        <option value="||">or</option>
+                      </select>
+                      <div class="right-holder holder"></div>
                     </div>
                   </div>
-                </aside>
-              </li>
-  
-              <li class="navs text-nav">
-                <p>Text</p>
-                <aside class="target-div text-subside hidden">
-                  <div class="parent-overlay-bar">
-                    <div class="sidebar-header">
-                      <span class="material-symbols-outlined"> close </span>
-                    </div>
-                    <div class="blocks-list">
-                      <div
-                        class="data-block centered persist"
-                        data-index="0"
-                        data-block-type="text"
-                        data-math-type="single-text"
-                        data-dtype="string"
-                        draggable="true"
-                      >
-                        "
-                        <input type="text" />
-                        "
-                      </div>
+                </div>
+              </aside>
+            </li>
+
+            <li class="navs text-nav">
+              <p>Text</p>
+              <aside class="target-div text-subside hidden">
+                <div class="parent-overlay-bar">
+                  <div class="sidebar-header">
+                    <span class="material-symbols-outlined"> close </span>
+                  </div>
+                  <div class="blocks-list">
+                    <div
+                      class="data-block centered persist"
+                      data-index="0"
+                      data-block-type="text"
+                      data-math-type="single-text"
+                      data-dtype="string"
+                      draggable="true"
+                    >
+                      "
+                      <input type="text" />
+                      "
                     </div>
                   </div>
-                </aside>
-              </li>
-  
-              <!-- procedure nav section -->
-              <li class="navs procedure-nav">
-                <p>Procedure</p>
-                <aside class="target-div procedure-subside hidden">
-                  <div class="parent-overlay-bar">
-                    <div class="sidebar-header">
-                      <span class="material-symbols-outlined"> close </span>
-                    </div>
-                    <div class="blocks-list"><span>In progress...</span></div>
+                </div>
+              </aside>
+            </li>
+
+            <!-- procedure nav section -->
+            <li class="navs procedure-nav">
+              <p>Procedure</p>
+              <aside class="target-div procedure-subside hidden">
+                <div class="parent-overlay-bar">
+                  <div class="sidebar-header">
+                    <span class="material-symbols-outlined"> close </span>
                   </div>
-                </aside>
-              </li>
-            </ul>
-          </nav>
+                  <div class="blocks-list"><span>In progress...</span></div>
+                </div>
+              </aside>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Below is a sensitive region -->
+      <div class="code-blocks-area area">
+        <div class="root area">
+          <div class="code-blocks"></div>
         </div>
-  
-        <!-- Below is a sensitive region -->
-        <div class="code-blocks-area area">
-          <h2 class="title">Code Area</h2>
-          <div class="root area">
-            <div class="code-blocks"></div>
-          </div>
+        <div class="code-delete-btn">
+          <img src="${trashBtnURI}" alt="bin" />
         </div>
       </div>
-    </body>
 
-    <script nonce="${getNonce}" src="${mainURI}"></script>
+      <div class="code-generate-area area">
+        <h2 class="title">Code</h2>
+        <span class="code-holder"></span>
+        <div class="code-generate-btn">
+          <img src="${playBtnURI}" alt="play" />
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script nonce="${getNonce}" src="${mainURI}"></script>
 </html>`;
 }
 

@@ -3,37 +3,42 @@
   margin: 0;
   box-sizing: border-box;
   font-family: sans-serif;
+  color: black;
 }
 
 .canvas {
-  height: 95vh;
+  height: 100vh;
   /* width: 100%; */
-  /* background-color: red; */
-  padding: 1rem 2rem 2rem 2rem;
+  background-color: white;
+  /* padding: 1rem 2rem 2rem 2rem; */
 
   display: grid;
   grid-auto-flow: column;
-  grid-template-columns: 19rem 3fr;
+  grid-template-columns: 15rem 3fr 35rem;
   column-gap: 2rem;
 }
 
 /* Sidebar */
 
-.code-blocks-area {
+.code-blocks-area,
+.code-generate-area {
   /* background-color: green; */
   padding-inline: 1rem;
 }
 
+.code-generate-area {
+  padding-top: 1rem;
+  box-shadow: -5px 0px 10px -3px #dbd3c7;
+}
 .title {
   text-align: center;
-  margin-top: 1rem;
   font-weight: 900;
-  /* font-size: 1.5rem; */
+  font-size: 1.5rem;
 }
 
-.area {
+/* .area {
   border: 2px dashed black;
-}
+} */
 
 .blocks {
   /* background-color: red; */
@@ -56,6 +61,10 @@
   align-items: center;
 }
 
+.constructs-area {
+  background-color: rgb(185, 185, 185);
+}
+
 /* Code Area */
 
 .root {
@@ -64,9 +73,9 @@
   padding: 1rem;
 }
 
-.root.area {
+/* .root.area {
   border-color: red;
-}
+} */
 
 .code-blocks {
   display: flex;
@@ -244,4 +253,30 @@
 
 .variable-list > select > option {
   min-width: 5ch;
+}
+
+.code-generate-btn {
+  height: 60px;
+  width: 60px;
+  position: absolute;
+  top: 83.5%;
+  left: 85%;
+}
+
+.code-generate-btn:hover,
+.code-delete-btn:hover {
+  cursor: pointer;
+}
+
+.code-delete-btn {
+  height: 60px;
+  width: 60px;
+  position: relative;
+  left: 90%;
+  top: -5.5%;
+}
+
+.code-holder {
+  font-size: 1.6rem;
+  tab-size: 4;
 }
