@@ -1,6 +1,8 @@
 .side-navbar {
   position: relative;
   min-height: 100%;
+  background-color: #f5f5f5;
+  border-radius: 5px 0 0 5px;
 }
 
 .sidebar-header {
@@ -29,7 +31,7 @@ li > p {
 }
 
 li:not(.fg-color) > p:hover {
-  background-color: rgb(235, 235, 235) !important;
+  background-color: rgb(235, 235, 235);
 }
 
 .target-div {
@@ -46,6 +48,8 @@ li:not(.fg-color) > p:hover {
   min-width: 19rem;
   min-height: 100%;
   backdrop-filter: blur(2px);
+  position: relative;
+  z-index: 100;
 }
 
 .blocks-list {
@@ -58,8 +62,25 @@ li:not(.fg-color) > p:hover {
   color: red;
 }
 
-.blocks-list [data-block-type="loop"] .holder {
-  background-color: transparent;
+.blocks-list [data-block-type="procedure"] .holder,
+.blocks-list [data-block-type="loop"] .holder,
+.blocks-list .block-footer > .data-store,
+.blocks-list .holder,
+.blocks-list .datastore,
+.blocks-list .arg-holder {
+  background-color: #dedede;
+}
+
+.blocks-list .block-footer > .data-store {
+  min-width: 1.4rem;
+}
+
+.blocks-list .block-footer > .data-store {
+  min-width: 1.4rem;
+}
+
+.blocks-list .return-footer > .holder.children {
+  min-width: 16.2rem;
 }
 
 .create-var-section {
@@ -95,7 +116,7 @@ li:not(.fg-color) > p:hover {
   color: black !important;
 }
 .procedure-color {
-  background-color: orange;
+  background-color: rgb(204, 133, 0);
 }
 
 .fg-color {

@@ -87,12 +87,12 @@ function getWebviewContent(webview, extensionUri) {
   const sidebarStyleURI = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "media", "sidebar.css")
   );
-  const resetStyleURI = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "media", "reset.css")
-  );
-  const vscodeStyleURI = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "media", "vscode.css")
-  );
+  // const resetStyleURI = webview.asWebviewUri(
+  //   vscode.Uri.joinPath(extensionUri, "media", "reset.css")
+  // );
+  // const vscodeStyleURI = webview.asWebviewUri(
+  //   vscode.Uri.joinPath(extensionUri, "media", "vscode.css")
+  // );
 
   const playBtnURI = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "media", "play-circle-outline.svg")
@@ -119,248 +119,679 @@ function getWebviewContent(webview, extensionUri) {
     <body>
     <div class="canvas">
       <div class="constructs-area area">
-        <nav class="side-navbar">
-          <ul>
-            <!-- Math nav section -->
-            <li class="navs math-nav">
-              <p>Math</p>
-              <aside class="target-div math-subside hidden">
-                <div class="parent-overlay-bar">
-                  <div class="sidebar-header">
-                    <span class="material-symbols-outlined"> close </span>
-                  </div>
-                  <div class="blocks-list">
-                    <div
-                      class="data-block centered persist"
-                      data-index="0"
-                      data-block-type="math"
-                      data-math-type="single-num"
-                      data-dtype="number"
-                      draggable="true"
-                    >
-                      <input type="text" />
+        <div class="grid">
+          <nav class="side-navbar">
+            <ul>
+              <!-- Math nav section -->
+              <li class="navs math-nav">
+                <p>Math</p>
+                <aside class="target-div math-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
                     </div>
-                    <div
-                      class="data-block centered persist"
-                      data-index="1"
-                      data-block-type="math"
-                      data-math-type="arithmetic-operation"
-                      draggable="true"
-                    >
-                      <div class="left-holder holder"></div>
+                    <div class="blocks-list">
+                      <div
+                        class="data-block centered persist"
+                        data-index="0"
+                        data-block-type="math"
+                        data-math-type="single-num"
+                        data-dtype="number"
+                        draggable="true"
+                      >
+                        <input type="text" />
+                      </div>
+                      <div
+                        class="data-block centered persist"
+                        data-index="1"
+                        data-block-type="math"
+                        data-math-type="arithmetic-operation"
+                        draggable="true"
+                      >
+                        <div class="left-holder holder"></div>
 
-                      <select name="arithmetic-operators">
-                        <option value="+" selected>+</option>
-                        <option value="-">-</option>
-                        <option value="*">x</option>
-                        <option value="/">÷</option>
-                      </select>
-                      <div class="right-holder holder"></div>
-                    </div>
-                  </div>
-                </div>
-              </aside>
-            </li>
-
-            <!-- variable nav section -->
-            <li class="navs var-nav">
-              <p>Variables</p>
-              <aside class="target-div variable-subside hidden">
-                <div class="parent-overlay-bar">
-                  <div class="sidebar-header">
-                    <span class="material-symbols-outlined"> close </span>
-                  </div>
-                  <div class="create-var-section">
-                    <div class="code-block create-var" data-index="0">
-                      <div class="block-header centered">
-                        <p class="description">Create a new variable...</p>
+                        <select name="arithmetic-operators">
+                          <option value="+" selected>+</option>
+                          <option value="-">-</option>
+                          <option value="*">x</option>
+                          <option value="/">÷</option>
+                          <option value="%">%</option>
+                        </select>
+                        <div class="right-holder holder"></div>
                       </div>
                     </div>
                   </div>
-                  <div class="blocks-list hidden">
-                    <div
-                      class="code-block persist"
-                      data-index="0"
-                      data-block-type="variable"
-                      data-variable-type="set-variable"
-                      draggable="true"
-                    >
-                      <div class="block-header centered">
-                        <p class="description">
-                          set
-                          <label
-                            for="variable-list"
-                            class="variable-name variable-list"
+                </aside>
+              </li>
+
+              <!-- variable nav section -->
+              <li class="navs var-nav">
+                <p>Variables</p>
+                <aside class="target-div variable-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
+                    </div>
+                    <div class="blocks-list">
+                      <div
+                        class="code-block persist"
+                        data-index="0"
+                        data-block-type="variable"
+                        data-variable-type="create-variable"
+                        draggable="true"
+                      >
+                        <div class="block-header centered">
+                          <p class="description">variable, type</p>
+                          <select name="datatype">
+                            <option value="int" selected>integer</option>
+                            <option value="float">float</option>
+                            <option value="double">double</option>
+                            <option value="char">character</option>
+                            <option value="string">string</option>
+                          </select>
+                          <p class="description">name</p>
+                          <input
+                            type="text"
+                            class="variable-name"
+                            name="variable-name"
+                          />
+                          <p class="description">initial value</p>
+                          <!-- data-store section -->
+                          <div class="data-store"></div>
+                          <!-- data-store section -->
+                        </div>
+                      </div>
+                      <div
+                        class="code-block persist"
+                        data-index="1"
+                        data-block-type="variable"
+                        data-variable-type="set-variable"
+                        draggable="true"
+                      >
+                        <div class="block-header centered">
+                          <div class="warning">
+                            !
+                            <div class="warning-message">
+                              <div class="description">
+                                Warning: This block may only be used within a
+                                function.
+                              </div>
+                            </div>
+                          </div>
+                          <p class="description">
+                            set
+                            <label
+                              for="variable-list"
+                              class="variable-name variable-list"
+                            >
+                              <select name="variable-name">
+                                <option value="default" selected>
+                                  --Select--
+                                </option>
+                                <optgroup
+                                  class="vars-section"
+                                  label="variables"
+                                ></optgroup>
+                                <optgroup
+                                  class="args-section"
+                                  label="arguements"
+                                ></optgroup>
+                              </select>
+                            </label>
+                            to
+                          </p>
+                          <!-- data-store section -->
+                          <div class="data-store"></div>
+                          <!-- data-store section -->
+                        </div>
+                      </div>
+                      <div
+                        class="code-block persist"
+                        data-index="2"
+                        data-block-type="variable"
+                        data-variable-type="get-variable"
+                        data-variable-name="value"
+                        draggable="true"
+                      >
+                        <div class="block-header centered">
+                          <div class="warning">
+                            !
+                            <div class="warning-message">
+                              <div class="description">
+                                Warning: This block may only be used within a
+                                function.
+                              </div>
+                            </div>
+                          </div>
+                          <p class="description">
+                            get
+                            <label
+                              for="variable-list"
+                              class="variable-name variable-list"
+                            >
+                              <select name="variable-name">
+                                <option value="default" selected>
+                                  --Select--
+                                </option>
+                                <optgroup
+                                  class="vars-section"
+                                  label="variables"
+                                ></optgroup>
+                                <optgroup
+                                  class="args-section"
+                                  label="arguements"
+                                ></optgroup>
+                              </select>
+                            </label>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+              </li>
+
+              <!-- loop nav section -->
+              <li class="navs for-nav">
+                <p>Loops</p>
+                <aside class="target-div loop-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined">close</span>
+                    </div>
+                    <div class="blocks-list">
+                      <!-- While Loop -->
+                      <div
+                        class="persist"
+                        data-index="0"
+                        data-block-type="loop"
+                        data-loop-type="while"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <p class="description">repeat "while"</p>
+                          <!-- data-store section start -->
+                          <div class="data-store"></div>
+                          <!-- data-store section end -->
+                        </div>
+                        <div class="block-body code-block centered">
+                          <p class="description">do</p>
+                          <div class="holder children"></div>
+                        </div>
+                      </div>
+
+                      <!-- Until loop -->
+                      <div
+                        class="persist"
+                        data-index="1"
+                        data-block-type="loop"
+                        data-loop-type="until"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <p class="description">repeat "until"</p>
+                          <!-- data-store section start -->
+                          <div class="data-store"></div>
+                          <!-- data-store section end -->
+                        </div>
+                        <div class="block-body code-block centered">
+                          <p class="description">do</p>
+                          <div class="holder children"></div>
+                        </div>
+                      </div>
+
+                      <!-- Do while loop -->
+                      <div
+                        class="persist"
+                        data-index="2"
+                        data-block-type="loop"
+                        data-loop-type="do-while"
+                        draggable="true"
+                      >
+                        <div class="block-body code-block centered">
+                          <p class="description">do</p>
+                          <div class="holder children"></div>
+                        </div>
+                        <div class="block-header code-block centered">
+                          <p class="description">repeat "while"</p>
+                          <!-- data-store section start -->
+                          <div class="data-store"></div>
+                          <!-- data-store section end -->
+                        </div>
+                      </div>
+
+                      <!-- For Loop -->
+                      <div
+                        class="persist"
+                        data-index="3"
+                        data-block-type="loop"
+                        data-loop-type="for"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <p class="description">repeat with</p>
+                          <div
+                            class="data-block centered persist"
+                            data-index="1"
+                            data-block-type="math-block"
+                            data-math-type="arithmetic-operation"
+                            draggable="true"
                           >
-                            <select name="variable-name"></select>
-                          </label>
-                          to
-                        </p>
-                        <!-- data-store section -->
-                        <div class="data-store"></div>
-                        <!-- data-store section -->
-                      </div>
-                    </div>
-                    <div
-                      class="code-block persist"
-                      data-index="1"
-                      data-block-type="variable"
-                      data-variable-type="get-variable"
-                      data-variable-name="value"
-                      draggable="true"
-                    >
-                      <div class="block-header centered">
-                        <p class="description">
-                          get
-                          <label
-                            for="variable-list"
-                            class="variable-name variable-list"
-                          >
-                            <select name="variable-name"></select>
-                          </label>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </aside>
-            </li>
+                            <div class="data-store loop"></div>
 
-            <!-- loop nav section -->
-            <li class="navs for-nav">
-              <p>Loops</p>
-              <aside class="target-div loop-subside hidden">
-                <div class="parent-overlay-bar">
-                  <div class="sidebar-header">
-                    <span class="material-symbols-outlined">close</span>
+                            <p class="description">from</p>
+                            <div class="data-store"></div>
+                            <p class="description">to</p>
+                            <div class="data-store"></div>
+                            <p class="description">by</p>
+                            <div class="data-store"></div>
+                          </div>
+                        </div>
+                        <div class="block-body code-block centered">
+                          <p class="description">do</p>
+                          <div class="holder children"></div>
+                        </div>
+                      </div>
+
+                      <!-- break and continue block -->
+                      <div
+                        class="persist"
+                        data-index="4"
+                        data-block-type="loop"
+                        data-loop-type="break-continue"
+                        draggable="true"
+                      >
+                        <div class="block-header centered">
+                          <div class="warning">
+                            !
+                            <div class="warning-message">
+                              <div class="description">
+                                Warning: This block may only be used within a
+                                loop.
+                              </div>
+                            </div>
+                          </div>
+                          <select name="break-continue-loop">
+                            <option value="break out">break out</option>
+                            <option value="continue with next iteration">
+                              continue with next iteration
+                            </option>
+                          </select>
+                          <p class="description">of loop</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="blocks-list">
-                    <div
+                </aside>
+              </li>
+
+              <!-- condition nav section -->
+              <li class="navs condition-nav">
+                <p>Logic</p>
+                <aside class="target-div logic-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
+                    </div>
+                    <div class="blocks-list">
+                      <!-- Just If -->
+                      <div
+                        class="persist"
+                        data-index="0"
+                        data-block-type="logic"
+                        data-logic-type="if"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <p class="description">if</p>
+                          <!-- data-store section start -->
+                          <div class="data-store"></div>
+                          <!-- data-store section end -->
+                        </div>
+                        <div class="block-body code-block centered">
+                          <p class="description">do</p>
+                          <div class="holder children"></div>
+                        </div>
+                      </div>
+
+                      <!-- Switch Case -->
+                      <!-- <div
                       class="persist"
-                      data-index="0"
-                      data-block-type="loop"
-                      data-loop-type="while"
+                      data-index="1"
+                      data-block-type="logic"
+                      data-logic-type="if-else"
                       draggable="true"
                     >
                       <div class="block-header code-block centered">
-                        <p class="description">repeat "while"</p>
-                        <!-- data-store section start -->
+                        <p class="description">
+                          if following value <br />matches with nothing
+                        </p>
                         <div class="data-store"></div>
-                        <!-- data-store section end -->
                       </div>
-                      <div class="block-body code-block centered">
+                      <div class="block-body if code-block centered">
                         <p class="description">do</p>
-                        <div class="holder children dragged-over"></div>
+                        <div class="holder children if"></div>
+                      </div>
+
+                      <div class="block-header code-block centered else">
+                        <p class="description">matches with</p>
+                        <div class="data-store"></div>
+                      </div>
+                      <div class="block-body code-block centered else">
+                        <p class="description">do</p>
+                        <div class="holder children"></div>
+                      </div>
+                    </div> -->
+
+                      <!-- Logical Block -->
+                      <div
+                        class="data-block centered persist"
+                        data-index="2"
+                        data-block-type="logic"
+                        data-logic-type="logical-operation"
+                        draggable="true"
+                      >
+                        <div class="left-holder holder"></div>
+                        <select name="logical-operation">
+                          <option value="==" selected>=</option>
+                          <option value="!=">≠</option>
+                          <option value="<"><</option>
+                          <option value="<=">≤</option>
+                          <option value=">">></option>
+                          <option value=">=">≥</option>
+                        </select>
+                        <div class="right-holder holder"></div>
+                      </div>
+
+                      <!-- Boolean Block -->
+                      <div
+                        class="data-block centered persist"
+                        data-index="3"
+                        data-block-type="logic"
+                        data-logic-type="boolean-operation"
+                        draggable="true"
+                      >
+                        <div class="left-holder holder"></div>
+                        <select name="boolean-operation">
+                          <option value="&&" selected>and</option>
+                          <option value="||">or</option>
+                        </select>
+                        <div class="right-holder holder"></div>
+                      </div>
+
+                      <!-- not block -->
+                      <div
+                        class="persist"
+                        data-index="4"
+                        data-block-type="logic"
+                        data-logic-type="not"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <p class="description">not</p>
+                          <!-- data-store section start -->
+                          <div class="data-store"></div>
+                          <!-- data-store section end -->
+                        </div>
+                      </div>
+
+                      <!-- boolean block -->
+                      <div
+                        class="persist"
+                        data-index="5"
+                        data-block-type="logic"
+                        data-logic-type="boolean"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <select name="boolean">
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </aside>
-            </li>
+                </aside>
+              </li>
 
-            <!-- condition nav section -->
-            <li class="navs condition-nav">
-              <p>Logic</p>
-              <aside class="target-div logic-subside hidden">
-                <div class="parent-overlay-bar">
-                  <div class="sidebar-header">
-                    <span class="material-symbols-outlined"> close </span>
-                  </div>
-                  <div class="blocks-list">
-                    <div
-                      class="data-block centered persist"
-                      data-index="0"
-                      data-block-type="logic"
-                      data-logic-type="logical-operation"
-                      draggable="true"
-                    >
-                      <div class="left-holder holder"></div>
-                      <select name="logical-operation">
-                        <option value="==" selected>=</option>
-                        <option value="!=">≠</option>
-                        <option value="<"><</option>
-                        <option value="<=">≤</option>
-                        <option value=">">></option>
-                        <option value=">=">≥</option>
-                      </select>
-                      <div class="right-holder holder"></div>
+              <li class="navs text-nav">
+                <p>Text</p>
+                <aside class="target-div text-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
                     </div>
+                    <div class="blocks-list">
+                      <div
+                        class="data-block centered persist"
+                        data-index="0"
+                        data-block-type="text"
+                        data-text-type="single-text"
+                        data-dtype="string"
+                        draggable="true"
+                      >
+                        "
+                        <input type="text" />
+                        "
+                      </div>
 
-                    <div
-                      class="data-block centered persist"
-                      data-index="1"
-                      data-block-type="logic"
-                      data-logic-type="boolean-operation"
-                      draggable="true"
-                    >
-                      <div class="left-holder holder"></div>
-                      <select name="boolean-operation">
-                        <option value="&&" selected>and</option>
-                        <option value="||">or</option>
-                      </select>
-                      <div class="right-holder holder"></div>
+                      <!-- print block -->
+                      <div
+                        class="persist"
+                        data-index="1"
+                        data-block-type="text"
+                        data-text-type="print"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <p class="description">print</p>
+                          <!-- data-store section start -->
+                          <div class="data-store"></div>
+                          <!-- data-store section end -->
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </aside>
-            </li>
+                </aside>
+              </li>
 
-            <li class="navs text-nav">
-              <p>Text</p>
-              <aside class="target-div text-subside hidden">
-                <div class="parent-overlay-bar">
-                  <div class="sidebar-header">
-                    <span class="material-symbols-outlined"> close </span>
-                  </div>
-                  <div class="blocks-list">
-                    <div
-                      class="data-block centered persist"
-                      data-index="0"
-                      data-block-type="text"
-                      data-math-type="single-text"
-                      data-dtype="string"
-                      draggable="true"
-                    >
-                      "
-                      <input type="text" />
-                      "
+              <!-- procedure nav section -->
+              <li class="navs procedure-nav">
+                <p>Procedure</p>
+                <aside class="target-div procedure-subside hidden">
+                  <div class="parent-overlay-bar">
+                    <div class="sidebar-header">
+                      <span class="material-symbols-outlined"> close </span>
+                    </div>
+                    <div class="blocks-list">
+                      <!-- Procedure without return -->
+                      <div
+                        class="persist"
+                        data-index="0"
+                        data-block-type="procedure"
+                        data-procedure-type="no-return"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <span class="btn-parameter-store">+</span>
+                          <p class="description">function name</p>
+                          <input type="text" class="procedure-name" />
+                          <p class="description param-prefix hide">with:</p>
+                          <p class="description parameter-display"></p>
+                          <!-- parameter-store start -->
+                          <div class="parameter-store hide">
+                            <div class="create-new-parameter">
+                              <label for="parameter-input">Input name</label>
+                              <div>
+                                <input type="text" class="parameter-input" />
+                                <button>></button>
+                              </div>
+                            </div>
+                            <div class="view-parameters">
+                              <div
+                                data-block-type="procedure"
+                                data-procedure-type="input"
+                              >
+                                <div class="block-header code-block centered">
+                                  <p class="description">inputs</p>
+                                </div>
+                                <div class="block-body code-block centered">
+                                  <div class="holder children all-params"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- parameter-store end -->
+                        </div>
+                        <div class="block-body code-block centered">
+                          <div class="holder children procedure"></div>
+                        </div>
+                      </div>
+
+                      <!-- Procedure w/ return -->
+                      <div
+                        class="persist"
+                        data-index="1"
+                        data-block-type="procedure"
+                        data-procedure-type="return"
+                        draggable="true"
+                      >
+                        <div class="block-header code-block centered">
+                          <span class="btn-parameter-store">+</span>
+                          <p class="description">function name</p>
+                          <input type="text" class="procedure-name" />
+                          <p class="description param-prefix hide">with:</p>
+                          <p class="description parameter-display"></p>
+                          <!-- parameter-store start -->
+                          <div class="parameter-store hide">
+                            <div class="create-new-parameter">
+                              <label for="parameter-input">Input name</label>
+                              <div>
+                                <input type="text" class="parameter-input" />
+                                <button>></button>
+                              </div>
+                            </div>
+                            <div class="view-parameters">
+                              <div
+                                data-block-type="procedure"
+                                data-procedure-type="input"
+                              >
+                                <div class="block-header code-block centered">
+                                  <p class="description">inputs</p>
+                                </div>
+                                <div class="block-body code-block centered">
+                                  <div class="holder children all-params"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- parameter-store end -->
+                        </div>
+                        <div
+                          class="block-body code-block centered return-footer"
+                        >
+                          <div class="holder children procedure"></div>
+                        </div>
+                        <div class="block-footer">
+                          <p>return</p>
+                          <select name="datatype">
+                            <option value="int" selected>integer</option>
+                            <option value="float">float</option>
+                            <option value="double">double</option>
+                            <option value="char">character</option>
+                            <option value="string">string</option>
+                          </select>
+                          <div class="data-store"></div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </aside>
-            </li>
+                </aside>
+              </li>
+            </ul>
+          </nav>
 
-            <!-- procedure nav section -->
-            <li class="navs procedure-nav">
-              <p>Procedure</p>
-              <aside class="target-div procedure-subside hidden">
-                <div class="parent-overlay-bar">
-                  <div class="sidebar-header">
-                    <span class="material-symbols-outlined"> close </span>
+          <!-- Below is a sensitive region -->
+          <div class="code-blocks-area area">
+            <div class="root area">
+              <div class="code-blocks">
+                <div
+                  class="main-func"
+                  data-block-type="procedure"
+                  data-procedure-type="return"
+                  data-procedure-id="P0"
+                >
+                  <div class="block-header code-block centered">
+                    <span></span>
+                    <p class="description">function name</p>
+                    <input
+                      type="text"
+                      class="procedure-name"
+                      value="main"
+                      disabled
+                    />
+                    <p class="description param-prefix hide">with:</p>
+                    <p class="description parameter-display"></p>
+                    <!-- parameter-store start -->
+                    <div class="parameter-store hide">
+                      <div class="create-new-parameter">
+                        <label for="parameter-input">Input name</label>
+                        <div>
+                          <input type="text" class="parameter-input" />
+                          <button>></button>
+                        </div>
+                      </div>
+                      <div class="view-parameters">
+                        <div
+                          data-block-type="procedure"
+                          data-procedure-type="input"
+                        >
+                          <div class="block-header code-block centered">
+                            <p class="description">inputs</p>
+                          </div>
+                          <div class="block-body code-block centered">
+                            <div class="holder children all-params"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- parameter-store end -->
                   </div>
-                  <div class="blocks-list"><span>In progress...</span></div>
+                  <div class="block-body code-block centered return-footer">
+                    <div class="holder children procedure"></div>
+                  </div>
+                  <div class="block-footer">
+                    <p>return</p>
+                    <select name="datatype" disabled>
+                      <option value="int" selected>integer</option>
+                      <option value="float">float</option>
+                      <option value="double">double</option>
+                      <option value="char">character</option>
+                      <option value="string">string</option>
+                    </select>
+                    <div class="data-store"></div>
+                  </div>
                 </div>
-              </aside>
-            </li>
-          </ul>
-        </nav>
-      </div>
+              </div>
+            </div>
 
-      <!-- Below is a sensitive region -->
-      <div class="code-blocks-area area">
-        <div class="root area">
-          <div class="code-blocks"></div>
-        </div>
-        <div class="code-delete-btn">
-          <img src="${trashBtnURI}" alt="bin" />
+            <div class="code-delete-btn">
+              <img src="${trashBtnURI}" alt="bin" />
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="code-generate-area area">
-        <h2 class="title">Code - C Language</h2>
-        <span class="code-holder"></span>
-        <div class="code-generate-btn">
-          <img src="${playBtnURI}" alt="play" />
+        <div class="header">
+          <h2 class="title">Code - C Language</h2>
+        </div>
+        <div class="body">
+          <p class="code-holder">int count = 0;</p>
+          <div class="code-generate-btn">
+            <img src="${playBtnURI}" alt="play" />
+          </div>
         </div>
       </div>
     </div>
