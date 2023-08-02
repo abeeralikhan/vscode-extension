@@ -65,12 +65,17 @@ function activate(context) {
         }
 
         if (message.command === "beautifyC") {
+          console.log("------ Before beautify", message.code);
           const code = beautifyC(message.payload);
           panel.webview.postMessage({
             command: "codeGenerate",
             payload: code,
           });
           return;
+        }
+
+        if (message.command === "notifyCopied") {
+          vscode.window.showInformationMessage("Copied to clipboard.");
         }
       });
     })
@@ -155,7 +160,6 @@ function getWebviewContent(webview, extensionUri) {
                           <option value="-">-</option>
                           <option value="*">x</option>
                           <option value="/">÷</option>
-                          <option value="%">%</option>
                         </select>
                         <div class="right-holder holder"></div>
                       </div>
@@ -188,6 +192,7 @@ function getWebviewContent(webview, extensionUri) {
                             <option value="double">double</option>
                             <option value="char">character</option>
                             <option value="string">string</option>
+                            <option value="bool">bool</option>
                           </select>
                           <p class="description">name</p>
                           <input
@@ -785,10 +790,10 @@ function getWebviewContent(webview, extensionUri) {
 
       <div class="code-generate-area area">
         <div class="header">
-          <h2 class="title">Code - C Language</h2>
+          <h2 class="title">Code - C Language <button class="btn-copy-code">Copy</button></h2>
         </div>
         <div class="body">
-          <p class="code-holder">int count = 0;</p>
+          <p class="code-holder">Click play button to generate the code...</p>
           <div class="code-generate-btn">
             <img src="${playBtnURI}" alt="play" />
           </div>

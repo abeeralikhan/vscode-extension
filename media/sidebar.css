@@ -13,7 +13,7 @@
 }
 
 .sidebar-header > span {
-  color: black;
+  color: black !important;
   cursor: pointer;
   font-weight: bolder;
 }

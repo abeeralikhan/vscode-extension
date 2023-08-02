@@ -1,8 +1,10 @@
 {
   "name": "dragme",
   "displayName": "DragMe",
-  "description": "Block-based coding",
-  "version": "0.0.1",
+  "description": "Generate the code by dragging and dropping the blocks.",
+  "publisher": "BlockBasedProgramming",
+  "icon": "media/dragMe-perfect.png",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.73.0"
   },

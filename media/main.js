@@ -70,7 +70,7 @@
 
       draggedBlock.remove();
       return;
-    } catch {
+    } catch (error) {
       return;
     }
   });
@@ -115,7 +115,7 @@
         draggedBlock.remove();
         return;
       }
-    } catch {}
+    } catch (error) {}
 
     if (!afterBlock) {
       try {
@@ -1211,6 +1211,16 @@
     });
   }
 
+  // Copy code
+  const copyBtn = document.querySelector(".btn-copy-code");
+  const generatedCode = document.querySelector(".code-holder");
+  copyBtn.addEventListener("click", (event) => {
+    navigator.clipboard.writeText(generatedCode.innerText);
+    vscode.postMessage({
+      command: "notifyCopied",
+    });
+  });
+
   // SIDEBAR
   const sidebarLis = document.querySelectorAll(".navs > p");
   const subSidebars = document.querySelectorAll(".target-div");
@@ -1433,6 +1443,7 @@
       this.languageObj = this.languages[lang];
       let res = ``;
       let heads = ``;
+      this.headers = [];
 
       for (let i = 0; i < this.root.childElementCount; i++) {
         let block = this.root.children[i];
@@ -1444,11 +1455,10 @@
         for (let i = 0; i < this.headers.length; i++) {
           heads += this.languageObj.createHeader(this.headers[i]) + "\n";
         }
-        heads += "\n";
+        // heads += "\n";
       }
-      heads += res;
-      const codeHolder = document.querySelector(".code-holder");
-      codeHolder.innerText = heads;
+      res = heads + res;
+      return res;
     }
 
     blocksManager(block, end = false, set = false) {
@@ -1759,6 +1769,9 @@
         }
         return this.languageObj.createNot(valueBlock);
       } else if (element.dataset.logicType == "boolean") {
+        if (!this.headers.includes("stdbool.h")) {
+          this.headers.push("stdbool.h");
+        }
         return element.children[0].children[0].options[
           element.children[0].children[0].selectedIndex
         ].text;
@@ -1780,12 +1793,23 @@
           this.headers.push("stdio.h");
         }
         let valueBlock = element.children[0].children[1].children[0];
+        // console.log(valueBlock, valueBlock.dataset.blockType);
         if (valueBlock != undefined) {
-          if (valueBlock.dataset.blockType == "variable") {
+          if (valueBlock.dataset.blockType == "text") {
+            valueBlock = this.handleText(valueBlock);
+          } else if (valueBlock.dataset.blockType == "logic") {
+            if (valueBlock.dataset.logicType == "boolean") {
+              // console.log("print got:", valueBlock.dataset.logicType);
+              valueBlock = this.handleLogic(valueBlock);
+            }
+            // console.log("bool");
+          } else if (valueBlock.dataset.blockType == "math") {
+            valueBlock = this.handleMath(valueBlock);
+          } else if (valueBlock.dataset.blockType == "variable") {
             if (valueBlock.dataset.variableType == "get-variable") {
               valueBlock = this.blocksManager(valueBlock);
               let dtype = this.vars[valueBlock];
-              if (dtype == "int") {
+              if (dtype == "int" || dtype == "bool") {
                 dtype = "d";
               } else if (dtype == "float" || dtype == "double") {
                 dtype = "f";
@@ -1883,6 +1907,11 @@
 
   generateCodeBtn.addEventListener("click", (e) => {
     const code = codeGeneration.generateCode("c");
+    console.log(code);
+    vscode.postMessage({
+      command: "beautifyC",
+      payload: code,
+    });
   });
 
   // const generateCodeBtn = document.querySelector(".code-generate-btn");
@@ -1891,20 +1920,23 @@
 
   // generateCodeBtn.addEventListener("click", (e) => {
   //   const code = codeGeneration.generateCode("c");
-  //   vscode.postMessage({
-  //     command: "beautifyC",
-  //     payload: code,
-  //   });
+  // vscode.postMessage({
+  //   command: "beautifyC",
+  //   payload: code,
+  // });
   // });
 
-  // window.addEventListener("message", (e) => {
-  //   if (e.data.command === "codeGenerate") {
-  //     const code = e.data.payload;
-  //     codeHolder.innerHTML = code
-  //       .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
-  //       .replace(/\n/g, "<br>");
-  //   }
-  // });
+  window.addEventListener("message", (e) => {
+    if (e.data.command === "codeGenerate") {
+      const code = e.data.payload;
+      const codeHolder = document.querySelector(".code-holder");
+      codeHolder.innerHTML = code
+        .replace(/</g, "&lt")
+        .replace(/>/g, "&gt")
+        .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
+        .replace(/\n/g, "<br>");
+    }
+  });
 
   // Delete Blocks
   const deleteBtn = document.querySelector(".code-delete-btn");
